@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Stock Account</title>
+	<script type="text/javascript" src="js/jquery.js"></script>
+	<script type="text/javascript" src="js/stock.js"></script>
+	<link rel="stylesheet" type="text/css" href="css/stock.css">
+</head>
+<body>
+	<h1>Stock Kitty</h1>
+	<div class="stock_tables">
+		<input type="text" id="stock_ticker">
+		<button type="submit" id="search">Submit</button>
+
+		<div id="stock_info">
+			<h2> Find a Stock! </h2>
+		</div>
+	</div>
+
+ 	<div class="atm" id="account">
+	    <h2>Your Balance</h2>
+	    <div class="balance" id="balance">$0</div>
+	    <input id="Amount" type="text" placeholder="enter an amount">
+	    <input id="Deposit" type="button" value="Deposit">
+	    <input id="Withdraw" type="button" value="Withdraw">
+	</div>
+
+	<div id="portfolio">
+		<h2>Your Stocks</h2>
+		<table>
+		<tr>
+			<td>Name</td>
+			<td>Units</td>
+			<td>Purchase Price</td>
+			<td>Current Price</td>
+			<td>Profit / Loss</td>
+		</tr>
+		</table>
+
+	</div>
+
+</body>
+</html>
