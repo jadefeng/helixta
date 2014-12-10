@@ -1,15 +1,17 @@
 <!DOCTYPE html>
 <html>
 <head>
+	<meta charset="UTF-8">
 	<title>Stock Account</title>
-	<script type="text/javascript" src="js/jquery.js"></script>
-	<script type="text/javascript" src="js/stock.js"></script>
-	<link rel="stylesheet" type="text/css" href="css/stock.css">
+	<script src="js/jquery.js"></script>
+	<script src="js/underscore.js"></script>
+	<script src="js/stock.js"></script>
+	<link rel="stylesheet" href="css/stock.css">
 </head>
 <body>
 	<h1>Stock Kitty</h1>
 	<div class="stock_tables">
-		<input type="text" id="stock_ticker">
+		<input type="text" id="stock_ticker" placeholder="GOOG">
 		<button type="submit" id="search">Submit</button>
 
 		<div id="stock_info">
@@ -34,6 +36,7 @@
 			<td>Purchase Price</td>
 			<td>Current Price</td>
 			<td>Profit / Loss</td>
+			<td>Sell Stock</td>
 		</tr>
 		</table>
 

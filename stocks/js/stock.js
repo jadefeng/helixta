@@ -79,6 +79,7 @@ $(document).ready(function() {
         var purchase_price = $('.quote_price').text();
         console.log(name, purchase_price);
 
+        // TODO -- add the stock ID into an array
         var units = $('#num_stocks').val();
 
         var transaction = parseInt(units) * parseFloat(purchase_price);
@@ -87,13 +88,29 @@ $(document).ready(function() {
         account.withdraw(transaction);
         ATM.update();
 
-        var html = '<tr> <td>' + name + '</td> <td> ' + units + '</td> <td> $' + purchase_price + '</td> <td> FUTURE PRICE </td> <td> Profit/Loss </td> </tr>';
+        var html = '<tr> <td>' + name + '</td> <td> ' + units + '</td> <td> $' + purchase_price + '</td> <td> FUTURE PRICE </td> <td> Profit/Loss </td> <td> <button class="sell"> Sell! </button> </td></tr> ';
         $('table').append(html);
 
         // if (account.balance) { }
 
     }
 
+    // Update the stock prices using ajax calls every second
+    // TODO - work through the stockID array and call through the yahoofinance aPI
+    // TODO - update the value in the HTML accordingly
+
+
+    // Manage a sell stock
+        // Event listener on 'sell' button
+        // If click on "sell"
+        // Finds the stock
+        // Finds updated "current price"
+        // Adds # * new stock price
+        // Removes stock from portfolio
+
+    // $('body').find('.sell').on('click', 
+    //     console.log("selling stock")
+    // )
 
 
 });
