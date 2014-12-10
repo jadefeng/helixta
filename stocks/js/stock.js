@@ -112,5 +112,7 @@ $(document).ready(function() {
     //     console.log("selling stock")
     // )
 
+    // Need to incorporate local storage -- updates local storage array of stock each time there is a buy or sell 
+    // Local storage also works on the $ in my portfolio
 
 });
