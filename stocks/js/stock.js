@@ -19,28 +19,41 @@ $(document).ready(function() {
     $('#search').on('click', getStock);
     $('.stock_tables').on('click', '#buy_button', buyStocks);
 
-    function getStock() {
+    function yahooFinance(symbol, callback) {
         var url = "http://query.yahooapis.com/v1/public/yql";
-        var symbol = $("#stock_ticker").val();
         var data = encodeURIComponent("select * from yahoo.finance.quotes where symbol in ('" + symbol + "')");
-
         $.getJSON(url, 'q=' + data + "&format=json&diagnostics=true&env=http://datatables.org/alltables.env")
             .done(function (data) {
-            var quote_output = data.query.results.quote;
+                callback(data.query.results.quote);
+            }).fail(function (jqxhr, textStatus, error) {
+                callback(null);
+                // $("#stock_info").text('Request failed: ' + err);
+            });
+    };    
+
+    
+
+    function getStock() {
+        var symbol = $("#stock_ticker").val();
+
+        yahooFinance(symbol, stockInformation )
+
+        
+        function stockInformation(quote_output) {
+            // var quote_output = data.query.results.quote;
+            var symbol = '<h2 class="quote_symbol">' + quote_output.Symbol + '</h2>';
             var name = '<h2 class="quote_name">' + quote_output.Name + '</h2>';
             var price = '<h3 class="quote_price">' + quote_output.LastTradePriceOnly + '</h3>';
             var num_stocks = '<input type="number" id="num_stocks">';
             var buy_button = '<button id="buy_button"> Buy Stock! </button>';
 
-            $("#stock_info").html(name + price + num_stocks + buy_button);
-            console.log(data.query.results.quote);
-        })
-            .fail(function (jqxhr, textStatus, error) {
-                $("#stock_info").text('Request failed: ' + err);
-        });
+            $("#stock_info").html(symbol + name + price + num_stocks + buy_button);
+            console.log(quote_output);
+        }
+            
 
         $("#stock_ticker").val("");
-    }
+    };
 
     // Getting the balance working for money to go in and out
     ATM = {
@@ -73,10 +86,13 @@ $(document).ready(function() {
 
     // Buying a stock
 
+
     function buyStocks() {
         console.log("Hello lets buy a stock");
         var name = $('.quote_name').text();
         var purchase_price = $('.quote_price').text();
+        var symbol = $('.quote_symbol').text();
+        var current_price;
         console.log(name, purchase_price);
 
         // TODO -- add the stock ID into an array
@@ -88,8 +104,21 @@ $(document).ready(function() {
         account.withdraw(transaction);
         ATM.update();
 
-        var html = '<tr> <td>' + name + '</td> <td> ' + units + '</td> <td> $' + purchase_price + '</td> <td> FUTURE PRICE </td> <td> Profit/Loss </td> <td> <button class="sell"> Sell! </button> </td></tr> ';
-        $('table').append(html);
+        // Update Price
+        function updatePrice() {
+            yahooFinance(symbol, stockInformationUpdate )
+
+            function stockInformationUpdate(quote_output) {
+                current_price = '<h3 class="quote_price">' + quote_output.LastTradePriceOnly + '</h3>';
+                var html = '<tr> <td>' + name + '</td> <td> ' + units + '</td> <td> $' + purchase_price + '</td> <td>' + current_price  + '</td> <td> Profit/Loss </td> <td> <button class="sell"> Sell! </button> </td></tr> ';
+                $('table').html(html);
+                console.log("just found the latest price!");
+            }
+        }
+
+
+        setInterval( updatePrice ,1000)
+
 
         // if (account.balance) { }
 
