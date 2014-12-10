@@ -101,23 +101,27 @@ $(document).ready(function() {
         var transaction = parseInt(units) * parseFloat(purchase_price);
         console.log(transaction);
 
-        account.withdraw(transaction);
-        ATM.update();
+        if ( account.balance >= transaction ) {
+            account.withdraw(transaction);
+            ATM.update();
 
-        // Update Price
-        function updatePrice() {
-            yahooFinance(symbol, stockInformationUpdate )
+            // Update Price
+            function updatePrice() {
+                yahooFinance(symbol, stockInformationUpdate )
 
-            function stockInformationUpdate(quote_output) {
-                current_price = '<h3 class="quote_price">' + quote_output.LastTradePriceOnly + '</h3>';
-                var html = '<tr> <td>' + name + '</td> <td> ' + units + '</td> <td> $' + purchase_price + '</td> <td>' + current_price  + '</td> <td> Profit/Loss </td> <td> <button class="sell"> Sell! </button> </td></tr> ';
-                $('table').html(html);
-                console.log("just found the latest price!");
+                function stockInformationUpdate(quote_output) {
+                    current_price = '<h3 class="quote_price">' + quote_output.LastTradePriceOnly + '</h3>';
+                    var html = '<tr> <td>' + name + '</td> <td> ' + units + '</td> <td> $' + purchase_price + '</td> <td>' + current_price  + '</td> <td> Profit/Loss </td> <td> <button class="sell"> Sell! </button> </td></tr> ';
+                    $('table').html(html);
+                    console.log("just found the latest price!");
+                }
             }
+
+
+            setInterval( updatePrice ,1000)
+        } else {
+            console.log("Need more money")
         }
-
-
-        setInterval( updatePrice ,1000)
 
 
         // if (account.balance) { }
