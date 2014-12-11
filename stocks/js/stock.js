@@ -1,37 +1,127 @@
+'use strict'
+
 // Stock portfolio balance account
 var account = {
     balance: 0,
-    deposit: function (amount) {
-        if (amount > 0) {
-            account.balance += amount;
-        }
-    },
-    withdraw: function (amount) {
-        if (amount <= account.balance && amount > 0) {
-            account.balance -= amount;
-        } 
-    }
+    purchases: {},
+    purchaseCount: 0
 };
 
+// Render purchases on page
+function yahooFinance(symbol, callback) {
+    var url = "http://query.yahooapis.com/v1/public/yql";
+    var data = encodeURIComponent("select * from yahoo.finance.quotes where symbol in ('" + symbol + "')");
+    $.getJSON(url, 'q=' + data + "&format=json&diagnostics=true&env=http://datatables.org/alltables.env")
+        .done(function (data) {
+            // data.query.results.quote.LastTradePriceOnly*= 1 
+            // data.query.results.quote.LastTradePriceOnly+= Math.random()
+            callback(data.query.results.quote);
+        }).fail(function (jqxhr, textStatus, error) {
+            console.error("The request failed.")
+            $("#stock_info").text('Request failed: ' + err);
+            callback(null);
+        });
+};  
+
+
+
+
 $(document).ready(function() {
+    function renderPurchase( purchaseKey) {
+
+        var stockPurchase = account.purchases[purchaseKey]
+        // function appendTable() {
+            var row = $('<tr></tr>')
+            var nameCell = $('<td></td>')
+            var unitsCell = $('<td></td>')
+            var purchasePriceCell = $('<td></td>')
+            var currentPriceCell = $('<td></td>')
+            var sellCell = $('<td></td>')
+            var sellButton = $('<button>Sell</button>')
+            var symbol = stockPurchase.symbol
+            nameCell.text(stockPurchase.name)
+            unitsCell.text(stockPurchase.units)
+            purchasePriceCell.text(stockPurchase.purchase_price)
+            currentPriceCell.text(stockPurchase.purchase_price)            
+            sellCell.append(sellButton)
+                
+            row.append(nameCell).append(unitsCell).append(purchasePriceCell).append(currentPriceCell).append(sellCell);
+
+            $('table').append(row)
+        // }
+        // appendTable()
+
+        // Update Price
+        function updatePrice() {
+            yahooFinance(symbol, stockInformationUpdate )
+
+            function stockInformationUpdate(quote_output) {
+                var current_price = quote_output.LastTradePriceOnly;
+                currentPriceCell.text(current_price)
+
+                console.log("just found the latest price!");
+            }
+            // debugger;
+        }
+
+        var updatingPriceInterval = setInterval( updatePrice , 5000)
+
+        yahooFinance(
+            symbol,
+            function(quote)
+            {
+                var current_price = quote.LastTradePriceOnly;
+                sellButton.click( function() {
+                    var moneyFromStock = stockPurchase.units * current_price;
+                    deposit(moneyFromStock);
+                    clearInterval( updatingPriceInterval );
+
+                    row.remove();
+
+                    delete account.purchases[purchaseKey];
+
+                    console.log('deleted')
+                    console.log(account)
+
+                })
+            })
+    }    
+
+
+
+    if (localStorage.getItem("account") !== null) {
+        account = JSON.parse(localStorage.getItem('account'))
+
+        // Rendering all purchases on window load
+        for (var purchase_key in account.purchases) {
+            // debugger;
+            renderPurchase( purchase_key )
+        }
+    }
+
+    $(window).unload( function() {
+        localStorage.setItem('account', JSON.stringify(account))
+    })
+
+    var deposit = function (amount) {
+        if (amount > 0) {
+            account.balance += amount;
+            ATM.update()
+        }
+    }
+
+    var withdraw = function (amount) {
+        if (amount <= account.balance && amount > 0) {
+            account.balance -= amount;
+            ATM.update()
+        } 
+    }        
+
 
     // Finding the stock ticker price and details
     $('#search').on('click', getStock);
     $('.stock_tables').on('click', '#buy_button', buyStocks);
-
-    function yahooFinance(symbol, callback) {
-        var url = "http://query.yahooapis.com/v1/public/yql";
-        var data = encodeURIComponent("select * from yahoo.finance.quotes where symbol in ('" + symbol + "')");
-        $.getJSON(url, 'q=' + data + "&format=json&diagnostics=true&env=http://datatables.org/alltables.env")
-            .done(function (data) {
-                callback(data.query.results.quote);
-            }).fail(function (jqxhr, textStatus, error) {
-                callback(null);
-                // $("#stock_info").text('Request failed: ' + err);
-            });
-    };    
-
-    
+  
 
     function getStock() {
         var symbol = $("#stock_ticker").val();
@@ -40,7 +130,6 @@ $(document).ready(function() {
 
         
         function stockInformation(quote_output) {
-            // var quote_output = data.query.results.quote;
             var symbol = '<h2 class="quote_symbol">' + quote_output.Symbol + '</h2>';
             var name = '<h2 class="quote_name">' + quote_output.Name + '</h2>';
             var price = '<h3 class="quote_price">' + quote_output.LastTradePriceOnly + '</h3>';
@@ -56,7 +145,7 @@ $(document).ready(function() {
     };
 
     // Getting the balance working for money to go in and out
-    ATM = {
+    var ATM = {
         ui: {
             $Deposit: $('#Deposit'),
             $Withdraw: $('#Withdraw'),
@@ -70,29 +159,30 @@ $(document).ready(function() {
             ATM.ui.$Amount.val('');
         }
     };
+    ATM.update(); // Call this on page load
 
     ATM.ui.$Deposit.on('click',function(){
         var amount = parseInt(ATM.ui.$Amount.val());
-        account.deposit(amount);
+        deposit(amount);
         ATM.update();
     });
 
     ATM.ui.$Withdraw.on('click',function(){
         var amount = parseInt(ATM.ui.$Amount.val());
-        account.withdraw(amount);
+        withdraw(amount);
         ATM.update();
     }); 
 
 
-    // Buying a stock
 
+    // Buying a stock
 
     function buyStocks() {
         console.log("Hello lets buy a stock");
         var name = $('.quote_name').text();
         var purchase_price = $('.quote_price').text();
         var symbol = $('.quote_symbol').text();
-        var current_price;
+        var current_price = purchase_price;
         console.log(name, purchase_price);
 
         // TODO -- add the stock ID into an array
@@ -101,51 +191,52 @@ $(document).ready(function() {
         var transaction = parseInt(units) * parseFloat(purchase_price);
         console.log(transaction);
 
+
         if ( account.balance >= transaction ) {
-            account.withdraw(transaction);
+            account.purchaseCount += 1
+            var purchaseKey = account.purchaseCount
+            var purchase = { symbol: symbol, name: name, units: units, purchase_price: purchase_price  }
+            // Putting the new purchase into the account in the localStorage, with a purchaseCount as the key and the purchase as the values
+            account.purchases[purchaseKey] = purchase 
+            renderPurchase(purchaseKey)
+
+            withdraw(transaction);
             ATM.update();
 
-            // Update Price
-            function updatePrice() {
-                yahooFinance(symbol, stockInformationUpdate )
 
-                function stockInformationUpdate(quote_output) {
-                    current_price = '<h3 class="quote_price">' + quote_output.LastTradePriceOnly + '</h3>';
-                    var html = '<tr> <td>' + name + '</td> <td> ' + units + '</td> <td> $' + purchase_price + '</td> <td>' + current_price  + '</td> <td> Profit/Loss </td> <td> <button class="sell"> Sell! </button> </td></tr> ';
-                    $('table').html(html);
-                    console.log("just found the latest price!");
-                }
-            }
+            // var row = $('<tr></tr>')
+            // var nameCell = $('<td></td>')
+            // var unitsCell = $('<td></td>')
+            // var purchasePriceCell = $('<td></td>')
+            // var currentPriceCell = $('<td></td>')
+            // var sellCell = $('<td></td>')
+            // var sellButton = $('<button>Sell</button>')
+
+            // nameCell.text(name)
+            // unitsCell.text(units)
+            // purchasePriceCell.text(purchase_price)
+            // currentPriceCell.text(current_price)            
+            // sellCell.append(sellButton)
+            
+            // row.append(nameCell).append(unitsCell).append(purchasePriceCell).append(currentPriceCell).append(sellCell);
+
+            // console.log(row);
+            // $('table').append(row);
 
 
-            setInterval( updatePrice ,1000)
+
         } else {
-            console.log("Need more money")
+            alert("Need more money")
         }
-
-
-        // if (account.balance) { }
 
     }
 
-    // Update the stock prices using ajax calls every second
-    // TODO - work through the stockID array and call through the yahoofinance aPI
-    // TODO - update the value in the HTML accordingly
+    // local storage
+    // currency difference ( wish list, will need to incorporate currency realtime )
+    // prettify!
 
+    // Can sell some of the stock, not all the stock
 
-    // Manage a sell stock
-        // Event listener on 'sell' button
-        // If click on "sell"
-        // Finds the stock
-        // Finds updated "current price"
-        // Adds # * new stock price
-        // Removes stock from portfolio
-
-    // $('body').find('.sell').on('click', 
-    //     console.log("selling stock")
-    // )
-
-    // Need to incorporate local storage -- updates local storage array of stock each time there is a buy or sell 
-    // Local storage also works on the $ in my portfolio
+    // Average purchase price if you choose to buy the same stock again
 
 });
