@@ -204,27 +204,6 @@ $(document).ready(function() {
             ATM.update();
 
 
-            // var row = $('<tr></tr>')
-            // var nameCell = $('<td></td>')
-            // var unitsCell = $('<td></td>')
-            // var purchasePriceCell = $('<td></td>')
-            // var currentPriceCell = $('<td></td>')
-            // var sellCell = $('<td></td>')
-            // var sellButton = $('<button>Sell</button>')
-
-            // nameCell.text(name)
-            // unitsCell.text(units)
-            // purchasePriceCell.text(purchase_price)
-            // currentPriceCell.text(current_price)            
-            // sellCell.append(sellButton)
-            
-            // row.append(nameCell).append(unitsCell).append(purchasePriceCell).append(currentPriceCell).append(sellCell);
-
-            // console.log(row);
-            // $('table').append(row);
-
-
-
         } else {
             alert("Need more money")
         }
