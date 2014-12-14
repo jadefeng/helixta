@@ -37,8 +37,8 @@ $(document).ready(function () {
         $.getJSON(url, 'q=' + data + "&format=json&diagnostics=true&env=http://datatables.org/alltables.env")
             .done(function (data) {
                 // // To test if the prices are updating
-                data.query.results.quote.LastTradePriceOnly*= 1 
-                data.query.results.quote.LastTradePriceOnly+= Math.random()
+                // data.query.results.quote.LastTradePriceOnly*= 1 
+                // data.query.results.quote.LastTradePriceOnly+= Math.random()
                 callback(data.query.results.quote);
             }).fail(function (jqxhr, textStatus, error) {
                 console.error("The request failed.");
@@ -172,7 +172,7 @@ $(document).ready(function () {
   
 
     function getStock() {
-
+        $('#stock_info').empty();
         var symbol = $("#stock_ticker").val();
         yahooFinance(symbol, stockInformation )
 
@@ -195,7 +195,6 @@ $(document).ready(function () {
     // Buying a stock
     function buyStocks() {
         // Todo - move this logic out of the DOM and directly from the quote_output
-        console.log("Hello lets buy a stock");
         var name = $('.quote_name').text();
         var purchase_price = $('.quote_price').text().replace('$','');
         var symbol = $('.quote_symbol').text();
@@ -225,8 +224,7 @@ $(document).ready(function () {
 
     }
 
-    // currency difference ( wish list, will need to incorporate currency realtime )
     // prettify!
-    // Average purchase price if you choose to buy the same stock again
+    // TODO - Average purchase price if you choose to buy the same stock again
 
 });
