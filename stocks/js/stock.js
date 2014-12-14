@@ -13,26 +13,25 @@ $(document).ready(function () {
                 return i && c !== "." && !((a.length - i) % 3) ? ',' + c : c;
             });;
         if (parseFloat(amount) >= 0) {
-            return '$' + total    
+            return '$' + total;  
         } else {
-            return '-$' + total
+            return '-$' + total;
         }
-        
-    } 
+    };
 
     // Checking if page has localStorage
     if (localStorage.getItem("account") !== null) {
-        account = JSON.parse(localStorage.getItem('account'))
+        account = JSON.parse(localStorage.getItem('account'));
 
         // Rendering all purchases on window load
         for (var purchase_key in account.purchases) {
-            renderPurchase( purchase_key )
+            renderPurchase( purchase_key );
         }
     };
 
     // Saving account to localstorage upon window close
     $(window).unload( function() {
-        localStorage.setItem('account', JSON.stringify(account))
+        localStorage.setItem('account', JSON.stringify(account));
     });
 
     // Yahoo Finance call function
@@ -64,7 +63,7 @@ $(document).ready(function () {
         var profitCell = $('<td/>')
         var sellQuantityCell = $('<td/>');
         var sellCell = $('<td/>');
-        var sellQuantityInput = $('<input type=number max=' + stockPurchase.units + '>') 
+        var sellQuantityInput = $('<input type=number min=0 max=' + stockPurchase.units + '>');
         var sellButton = $('<button class="btn btn-warning">Sell</button>');
         var symbol = stockPurchase.symbol;
         symbolCell.text(stockPurchase.symbol)
@@ -88,12 +87,12 @@ $(document).ready(function () {
                 var current_price = quote_output.LastTradePriceOnly;
                 currentPriceCell.text(formatMoneyAmount(current_price));
 
-                var profit = (current_price - stockPurchase.purchase_price) * stockPurchase.units
+                var profit = (current_price - stockPurchase.purchase_price) * stockPurchase.units;
                 profitCell.text(formatMoneyAmount(profit));
             }
         }
         // Update executed every 5 seconds
-        var updatingPriceInterval = setInterval( updatePrice , 5000)
+        var updatingPriceInterval = setInterval( updatePrice , 5000);
 
         // Sell a stock
         yahooFinance(
@@ -211,7 +210,7 @@ $(document).ready(function () {
         console.log(transaction);
 
 
-        if ( account.balance >= transaction ) {
+        if ( account.balance >= transaction && transaction > 0 && parseInt(units) === parseFloat(units) ) {
             account.purchaseCount += 1
             var purchaseKey = account.purchaseCount
             var purchase = { symbol: symbol, name: name, units: units, purchase_price: purchase_price  }
@@ -222,9 +221,8 @@ $(document).ready(function () {
             withdraw(transaction);
             ATM.update();
 
-
         } else {
-            alert("Need more money")
+            alert("This transaction cannot be conducted.")
         }
 
     }
