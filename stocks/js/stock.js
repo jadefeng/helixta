@@ -46,7 +46,6 @@ $(document).ready(function () {
                 callback(data.query.results.quote);
             }).fail(function (jqxhr, textStatus, error) {
                 console.error("The request failed.");
-                $("#stock_info").text('Request failed: ' + err);
                 callback(null);
             });
     };      
@@ -103,8 +102,8 @@ $(document).ready(function () {
 
                 sellButton.click( function() {
                     var stockPurchaseSell = stockPurchase.units;
-                    var sellUnits = Math.floor( sellQuantityInput.val() );
-                    if (sellUnits <= 0 || sellUnits > stockPurchaseSell ) {
+                    var sellUnits = sellQuantityInput.val() ;
+                    if (sellUnits <= 0 || sellUnits > stockPurchaseSell || parseInt(sellUnits) == parseFloat(sellUnits) ) {
                         alert("Cannot complete this transaction");
                         return;
                     } else if ( sellUnits <= stockPurchaseSell ) {
