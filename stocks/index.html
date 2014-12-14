@@ -4,43 +4,51 @@
 	<meta charset="UTF-8">
 	<title>Stock Account</title>
 	<script src="js/jquery.js"></script>
-	<script src="js/underscore.js"></script>
 	<script src="js/stock.js"></script>
+	<link rel="stylesheet" type="text/css" href="css/bootstrap.css">
 	<link rel="stylesheet" href="css/stock.css">
 </head>
 <body>
-	<h1>Stock Kitty</h1>
-	<div class="stock_tables">
-		<input type="text" id="stock_ticker" placeholder="GOOG">
-		<button type="submit" id="search">Submit</button>
+	<div class="container">
+		<h1>Stock Kitty</h1>
+		<div class="page_column">
+			<div class="stock_tables">
+				<h2>Find a stock!</h2>
+				<input type="text" id="stock_ticker" placeholder="GOOG">
+				<br>
+				<button type="submit" id="search" class="btn btn-default">Search</button>
 
-		<div id="stock_info">
-			<h2> Find a Stock! </h2>
+				<div id="stock_info">
+				</div>
+			</div>
 		</div>
-	</div>
+		<div class="page_column">
+		 	<div class="atm" id="account">
+			    <h2>Your Balance</h2>
+			    <div class="balance" id="balance">$0</div>
+			    <br>
+			    <input id="amount" type="text" placeholder="Enter an amount">
+			    <br>
+			    <input id="deposit" type="button" value="deposit" class="btn btn-success">
+			    <input id="withdraw" type="button" value="withdraw" class="btn btn-danger">
+			</div>
+		</div>
 
- 	<div class="atm" id="account">
-	    <h2>Your Balance</h2>
-	    <div class="balance" id="balance">$0</div>
-	    <input id="amount" type="text" placeholder="enter an amount">
-	    <input id="deposit" type="button" value="deposit">
-	    <input id="withdraw" type="button" value="withdraw">
-	</div>
+		<div id="portfolio">
+			<h2>Your Purr-folio</h2>
+			<table>
+			<th>
+				<td><strong> Name </strong> </td>
+				<td><strong> Units </strong> </td>
+				<td><strong> Purchase Price </strong> </td>
+				<td><strong> Current Price </strong> </td>
+				<td><strong> Profit / Loss </strong> </td>
+				<td><strong> Sell Quantity </strong> </td>
+				<td><strong> Sell Stock </strong> </td>
+			</th>
+			</table>
 
-	<div id="portfolio">
-		<h2>Your Stocks</h2>
-		<table>
-		<tr>
-			<td>Name</td>
-			<td>Units</td>
-			<td>Purchase Price</td>
-			<td>Current Price</td>
-			<td>Profit / Loss</td>
-			<td>Sell Quantity</td>
-			<td>Sell Stock</td>
-		</tr>
-		</table>
-
+		</div>
 	</div>
 
 </body>

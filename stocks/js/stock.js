@@ -1,9 +1,4 @@
 'use strict';
-    // function formatMoneyAmount(amount) {
-    //     // var total = parseFloat(amount).toFixed(2).replace(/(\d)(?=(\d\d\d)+(?!\d))/g)
-    //     return '$' + total
-    // } 
-
 
 $(document).ready(function () {
     // Stock portfolio balance account to be stored in the localstorage
@@ -13,8 +8,6 @@ $(document).ready(function () {
         purchaseCount: 0
     };
 
-    // Checking if page has localStorage
-
     function formatMoneyAmount(amount) {
         var total = parseFloat(amount).toFixed(2).replace(/./g, function(c, i, a) {
             return i && c !== "." && !((a.length - i) % 3) ? ',' + c : c;
@@ -22,6 +15,7 @@ $(document).ready(function () {
         return '$' + total
     } 
 
+    // Checking if page has localStorage
     if (localStorage.getItem("account") !== null) {
         account = JSON.parse(localStorage.getItem('account'))
 
@@ -29,7 +23,12 @@ $(document).ready(function () {
         for (var purchase_key in account.purchases) {
             renderPurchase( purchase_key )
         }
-    }
+    };
+
+    // Saving account to localstorage upon window close
+    $(window).unload( function() {
+        localStorage.setItem('account', JSON.stringify(account))
+    });
 
     // Yahoo Finance call function
     function yahooFinance(symbol, callback) {
@@ -52,16 +51,18 @@ $(document).ready(function () {
     function renderPurchase( purchaseKey) {
         var stockPurchase = account.purchases[purchaseKey];
         var row = $('<tr></tr>');
-        var nameCell = $('<td></td>');
-        var unitsCell = $('<td></td>');
-        var purchasePriceCell = $('<td></td>');
-        var currentPriceCell = $('<td></td>');
+        var symbolCell = $('<td/>')
+        var nameCell = $('<td/>');
+        var unitsCell = $('<td/>');
+        var purchasePriceCell = $('<td/>');
+        var currentPriceCell = $('<td/>');
         var profitCell = $('<td/>')
-        var sellQuantityCell = $('<td></td>');
-        var sellCell = $('<td></td>');
+        var sellQuantityCell = $('<td/>');
+        var sellCell = $('<td/>');
         var sellQuantityInput = $('<input type=number max=' + stockPurchase.units + '>') 
-        var sellButton = $('<button>Sell</button>');
+        var sellButton = $('<button class="btn btn-warning">Sell</button>');
         var symbol = stockPurchase.symbol;
+        symbolCell.text(stockPurchase.symbol)
         nameCell.text(stockPurchase.name);
         unitsCell.text(stockPurchase.units);
         purchasePriceCell.text(formatMoneyAmount(stockPurchase.purchase_price));
@@ -70,11 +71,11 @@ $(document).ready(function () {
         sellQuantityCell.text(sellQuantityInput);
         sellCell.append(sellButton);
             
-        row.append(nameCell).append(unitsCell).append(purchasePriceCell).append(currentPriceCell).append(profitCell).append(sellQuantityInput).append(sellCell);
+        row.append(symbolCell).append(nameCell).append(unitsCell).append(purchasePriceCell).append(currentPriceCell).append(profitCell).append(sellQuantityInput).append(sellCell);
 
         $('table').append(row);
 
-        // Update Price
+        // Update Price 
         function updatePrice() {
             yahooFinance(symbol, stockInformationUpdate );
 
@@ -86,7 +87,7 @@ $(document).ready(function () {
                 profitCell.text(formatMoneyAmount(profit));
             }
         }
-
+        // Update executed every 5 seconds
         var updatingPriceInterval = setInterval( updatePrice , 5000)
 
         // Sell a stock
@@ -95,10 +96,10 @@ $(document).ready(function () {
             function(quote)
             {
                 var current_price = quote.LastTradePriceOnly;
+
                 sellButton.click( function() {
-                    // debugger;
-                    var stockPurchaseSell = stockPurchase.units 
-                    var sellUnits = Math.floor( sellQuantityInput.val() )
+                    var stockPurchaseSell = stockPurchase.units;
+                    var sellUnits = Math.floor( sellQuantityInput.val() );
                     if (sellUnits <= 0 || sellUnits > stockPurchaseSell ) {
                         alert("Cannot complete this transaction");
                         return;
@@ -111,22 +112,14 @@ $(document).ready(function () {
                             clearInterval(updatingPriceInterval);
                             delete account.purchases[purchaseKey];
                         } else {
-                        account.purchases[purchaseKey].units -= sellUnits
-                        renderPurchase( purchaseKey )
+                        account.purchases[purchaseKey].units -= sellUnits;
+                        renderPurchase( purchaseKey );
                         }
-
                     }
 
                 })
             })
-    }    
-
-
-
-
-    $(window).unload( function() {
-        localStorage.setItem('account', JSON.stringify(account))
-    })
+    };
 
     // Getting the ATM balance working for money to go in and out
     var ATM = {
@@ -139,12 +132,19 @@ $(document).ready(function () {
         },
 
         update : function() {
-            // debugger;
             ATM.ui.$balance.text(formatMoneyAmount(account.balance));
             ATM.ui.$amount.val('');
         }
     };
     ATM.update(); // Call this on page load
+
+    // Depositing money
+    var deposit = function (amount) {
+        if (amount > 0) {
+            account.balance += amount;
+            ATM.update()
+        }
+    };
 
     ATM.ui.$deposit.on('click',function(){
         var amount = parseInt(ATM.ui.$amount.val());
@@ -152,25 +152,19 @@ $(document).ready(function () {
         ATM.update();
     });
 
-    ATM.ui.$withdraw.on('click',function(){
-        var amount = parseInt(ATM.ui.$amount.val());
-        withdraw(amount);
-        ATM.update();
-    }); 
-
-    var deposit = function (amount) {
-        if (amount > 0) {
-            account.balance += amount;
-            ATM.update()
-        }
-    }
-
+    // Withdrawing money
     var withdraw = function (amount) {
         if (amount <= account.balance && amount > 0) {
             account.balance -= amount;
             ATM.update()
         } 
-    }        
+    };  
+
+    ATM.ui.$withdraw.on('click',function(){
+        var amount = parseInt(ATM.ui.$amount.val());
+        withdraw(amount);
+        ATM.update();
+    }); 
 
     // Finding the stock ticker price and details
     $('#search').on('click', getStock);
@@ -178,19 +172,19 @@ $(document).ready(function () {
   
 
     function getStock() {
-        var symbol = $("#stock_ticker").val();
 
+        var symbol = $("#stock_ticker").val();
         yahooFinance(symbol, stockInformation )
 
-        
+        // TODO - need to save the information in variables so that they can be accessed more easily in closure when buying stocks
         function stockInformation(quote_output) {
-            var symbol = '<h2 class="quote_symbol">' + quote_output.Symbol + '</h2>';
-            var name = '<h2 class="quote_name">' + quote_output.Name + '</h2>';
+            var symbol = '<h3 class="quote_symbol">' + quote_output.Symbol + '</h3>';
+            var name = '<h3 class="quote_name">' + quote_output.Name + '</h3>';
             var price = '<h3 class="quote_price">' + formatMoneyAmount(quote_output.LastTradePriceOnly) + '</h3>';
             var num_stocks = '<input type="number" id="num_stocks">';
-            var buy_button = '<button id="buy_button"> Buy Stock! </button>';
-
-            $("#stock_info").html(symbol + name + price + num_stocks + buy_button);
+            var buy_button = '<button id="buy_button" class="btn btn-success"> Buy Stock! </button>';
+            var divStock = '<div></div>'
+            $("#stock_info").append(symbol).append(name).append(price).append(num_stocks).append("<br>").append(buy_button);;
             console.log(quote_output);
         }
             
@@ -199,16 +193,14 @@ $(document).ready(function () {
 
 
     // Buying a stock
-
     function buyStocks() {
+        // Todo - move this logic out of the DOM and directly from the quote_output
         console.log("Hello lets buy a stock");
         var name = $('.quote_name').text();
-        var purchase_price = $('.quote_price').text();
+        var purchase_price = $('.quote_price').text().replace('$','');
         var symbol = $('.quote_symbol').text();
         var current_price = purchase_price;
         console.log(name, purchase_price);
-
-        // TODO -- add the stock ID into an array
         var units = $('#num_stocks').val();
 
         var transaction = parseInt(units) * parseFloat(purchase_price);
@@ -233,12 +225,8 @@ $(document).ready(function () {
 
     }
 
-    // local storage
     // currency difference ( wish list, will need to incorporate currency realtime )
     // prettify!
-
-    // Can sell some of the stock, not all the stock
-
     // Average purchase price if you choose to buy the same stock again
 
 });
