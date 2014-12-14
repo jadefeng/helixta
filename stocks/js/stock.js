@@ -9,10 +9,15 @@ $(document).ready(function () {
     };
 
     function formatMoneyAmount(amount) {
-        var total = parseFloat(amount).toFixed(2).replace(/./g, function(c, i, a) {
-            return i && c !== "." && !((a.length - i) % 3) ? ',' + c : c;
-        });;
-        return '$' + total
+        var total = Math.abs(parseFloat(amount)).toFixed(2).replace(/./g, function(c, i, a) {
+                return i && c !== "." && !((a.length - i) % 3) ? ',' + c : c;
+            });;
+        if (parseFloat(amount) >= 0) {
+            return '$' + total    
+        } else {
+            return '-$' + total
+        }
+        
     } 
 
     // Checking if page has localStorage
