@@ -3,6 +3,7 @@
 
 
 I broke down the process as thus:
+
 	1. Used JS YahooFinance API to pull out stock information quotes (30 min)
 	2. Made the ATM balance to allow for money withdrawal and deposits (45 min)
 	3. Linked stock purchases to the cash withdrawals (20 min)
