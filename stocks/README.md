@@ -21,5 +21,5 @@
 
 ## Any problems you ran into, and how you solved them
 ##### Setting up the listeners on each transaction i.e. listening for the click of the sellButton and the input number of stocks. 
-	##### Achieved using closures that would be set on each transaction rather than waiting for a click on a sellStock and bubbling up to find that stock information from the DOM 
-	##### Setting up the listener for "click sell" button needed to be done as a callback inside the YahooFinance function call. This is because it would require information about stock current_price, and would need to wait on the particular instance of the click of a sellButton 
+	#### Achieved using closures that would be set on each transaction rather than waiting for a click on a sellStock and bubbling up to find that stock information from the DOM 
+	#### Setting up the listener for "click sell" button needed to be done as a callback inside the YahooFinance function call. This is because it would require information about stock current_price, and would need to wait on the particular instance of the click of a sellButton 
