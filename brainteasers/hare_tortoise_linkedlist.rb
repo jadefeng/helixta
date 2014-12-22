@@ -42,7 +42,6 @@ def HareAndTortoiseLoop(llist)
 	end
 end
 
-
 puts HareAndTortoiseLoop(ll1)  	# => false 
 
 puts "Creating a loop"

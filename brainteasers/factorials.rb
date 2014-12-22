@@ -4,13 +4,10 @@
 def zerosInFactorial(n)
 	zero_counter = 0
 	index = 0
-	factorialArray = (1..n).to_a
 
 	until n < 5**index
 		index += 1
-		factorialArray.each do |num|
-			zero_counter += 1 if (num % 5**index == 0)
-		end
+		zero_counter += (n / (5**index))
 	end
 
 	puts "There are #{zero_counter} zero(s) at the end of #{n}!"
@@ -24,13 +21,10 @@ zerosInFactorial(128)	# => 31
 def findingPrime(n, prime)
 	prime_counter = 0
 	index = 0
-	numberArray = (1..n).to_a
 
 	until n < prime**index
-		index += 1
-		numberArray.each do |num|
-			prime_counter += 1 if (num % prime**index == 0)
-		end
+		index += 1 
+		prime_counter += (n / (prime**index))
 	end
 
 	puts "The #{prime} factor appears #{prime_counter} time(s) in the result of #{n}!"
